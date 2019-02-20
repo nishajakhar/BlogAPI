@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const blogModel = require("../model/blog_model");
 const mongoose = require("mongoose");
+const checkAuth = require("../middleware/check-auth");
 
 
-router.post('/blog',(req,res) => {
+router.post('/', checkAuth, (req,res) => {
     if(!req.body) {
         return res.status(400).send("Request body missing");
     }
@@ -25,7 +26,7 @@ router.post('/blog',(req,res) => {
     
 });
 
-router.get('/blog', (req,res) => {
+router.get('/', (req,res) => {
     blogModel.find()
         .exec()
         .then(docs => {
@@ -36,7 +37,7 @@ router.get('/blog', (req,res) => {
         });
     });
 
-router.get('/blog/:blogId', (req,res,next) => {
+router.get('/:blogId', (req,res,next) => {
     const queryid = req.params.blogId;
     blogModel.find({
         id : queryid
@@ -51,7 +52,7 @@ router.get('/blog/:blogId', (req,res,next) => {
 });
 
 
-router.put('/blog/:blogId', (req,res,next) => {
+router.put('/:blogId', checkAuth, (req,res,next) => {
     const changeProps = {};
     
     for(const [key,value] of Object.entries(req.body)){
@@ -69,7 +70,7 @@ router.put('/blog/:blogId', (req,res,next) => {
     
 });
 
-router.delete('/blog/:blogId', (req,res,next) => {
+router.delete('/:blogId', checkAuth, (req,res,next) => {
     blogModel.remove({id: req.params.blogId})
         .exec()
         .then(result => {
